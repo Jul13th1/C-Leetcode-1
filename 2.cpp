@@ -20,3 +20,24 @@ public:
     }
 };
 */
+
+/*
+输入：nums = [1,1,1,2,2,3]
+输出：5, nums = [1,1,2,2,3]
+
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        int count = 2;
+        for(int i = 2; i < nums.size(); i++)
+        {
+            if(nums[i] != nums[count-2])
+            {
+                nums[count++] = nums[i]; 
+            }
+        }
+        return count;
+    }
+};
+
+*/
