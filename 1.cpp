@@ -17,13 +17,16 @@ private:
     int& myRef; // 引用成员
 };
 
-class MyClass {
+/*
+class MyClass1 
+{
 public:
     // 常量成员变量
     const int constantValue;
 
     // 构造函数，使用初始化列表初始化常量成员
-    MyClass(int value) : constantValue(value) {
+    MyClass1(int value) : constantValue(value) 
+    {
         // 在这里不能对 constantValue 赋值
         // constantValue = value; // 这会导致编译错误
     }
@@ -32,3 +35,4 @@ public:
         std::cout << "Constant Value: " << constantValue << std::endl;
     }
 };
+*/
