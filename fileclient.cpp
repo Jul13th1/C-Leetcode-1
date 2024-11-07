@@ -8,7 +8,8 @@
 #define PORT 12345
 #define BUFFER_SIZE 1024
 
-void sendFile(const std::string& fileName, int serverSocket) {
+void sendFile(const std::string& fileName, int serverSocket) 
+{
     // 打开文件
     std::ifstream inFile(fileName, std::ios::binary);
     if (!inFile) {
@@ -27,7 +28,8 @@ void sendFile(const std::string& fileName, int serverSocket) {
 
     // 发送文件数据
     char buffer[BUFFER_SIZE];
-    while (inFile.read(buffer, sizeof(buffer))) {
+    while (inFile.read(buffer, sizeof(buffer))) 
+    {
         send(serverSocket, buffer, inFile.gcount(), 0);
     }
 
@@ -58,18 +60,20 @@ int main() {
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");  // 服务器IP
 
     // 连接服务器
-    if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+    if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) 
+    {
         std::cerr << "Connection failed!" << std::endl;
         return -1;
     }
 
-    std::string fileName = "testfile.txt";  // 假设发送的文件名
+    std::string fileName = "test.txt";  // 假设发送的文件名
     sendFile(fileName, clientSocket);
 
     // 等待服务器的完成确认
     char buffer[BUFFER_SIZE];
     int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-    if (bytesReceived > 0) {
+    if (bytesReceived > 0) 
+    {
         buffer[bytesReceived] = '\0';
         std::cout << "Server response: " << buffer << std::endl;
     }

@@ -1,12 +1,12 @@
 #include <iostream>
-#include <string>
+#include <cstring>
 #include <fstream>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
 #define PORT 12345
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 102400
 
 //接收客户端的文件头
 void recvFile(int clientSocket)
@@ -28,16 +28,42 @@ void recvFile(int clientSocket)
     std::string fileName = fileInfo.substr(0, fileInfo.find(","));
     // 通过 fileInfo.find(",") + 1 得到文件大小的开始位置。然后使用 substr 从该位置截取字符串，并通过 std::stol 将字符串转换为 long 类型的文件大小。
     long fileSize = std::stol(fileInfo.substr(fileInfo.find(",") + 1));
-    std::cout << "Receiving file: " << fileName << " (" << fileSize << " bytes)" << std::endl;
+    std::cout << "收到文件名 大小: " << fileName << " (" << fileSize << " bytes)" << std::endl;
 
     // 创建文件以写入数据
     // 使用 std::ofstream 打开一个输出文件流 outFile，并指定文件名 fileName
     std::ofstream outFile(fileName, std::ios::binary);
     if (!outFile) 
     {
-        std::cerr << "Failed to create the file!" << std::endl;
+        std::cerr << "文件创建失败!" << std::endl;
         return;
     }
+
+    // 接收文件数据
+    long totalBytesReceived = 0;
+    // 使用 while 循环持续接收文件数据，直到接收的数据量达到文件的总大小 fileSize。
+    while (totalBytesReceived < fileSize) 
+    {
+        bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
+        if (bytesReceived <= 0) 
+        {
+            std::cerr << "收取文件失败!" << std::endl;
+            break;
+        }
+        outFile.write(buffer, bytesReceived);
+        totalBytesReceived += bytesReceived;
+    }
+
+    // 关闭文件
+    std::cout << "文件接收成功!" << std::endl;
+    outFile.close();
+
+    // 发送传输完成的结束标志
+    const char* endMessage = "服务器文件接受完成!";
+    send(clientSocket, endMessage, strlen(endMessage), 0);
+
+    // 关闭客户端连接
+    close(clientSocket);
 }
 
 int main() 
