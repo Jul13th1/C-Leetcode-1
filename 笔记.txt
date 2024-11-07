@@ -28,3 +28,98 @@ function lambda bind 之间的关系
     std::bind 在 C++ 中的典型应用
     1.与标准库算法配合使用 std::bind 可以和标准库算法配合使用，来绑定函数和算法所需的参数。
     2.与线程结合 std::bind 可以用来将一个函数与其参数绑定，并传递给线程，从而在后台执行
+
+四.左值引用
+    左值引用是指向一个左值的引用，左值是指在表达式中可以获取地址的值
+    int x = 10;
+    int &ref = x;  // ref 是 x 的左值引用
+    左值（Lvalue）是指有持久地址的对象，通常是程序中的变量。
+    左值引用通过 & 来定义，引用必须绑定到一个已经存在的对象。
+    特点：
+        1.可以被修改：左值引用可以改变所引用的对象的值（如果对象本身是可修改的）。
+        2.必须引用已存在的对象：左值引用只能绑定到一个已存在的左值
+五.右值引用：
+    右值引用是指向一个右值的引用，右值是指那些不具有持久地址的值，通常是临时对象、字面量、计算结果等。
+    int&& rref = 10;  // rref 是右值引用，绑定到 10
+    右值（Rvalue）是临时对象，通常是表达式结果，无法获取其地址。
+    右值引用通过 && 来定义。
+    特点：1.可以修改临时对象：右值引用通常绑定到临时对象，允许直接操作或移动资源。
+         2.可以用于移动语义：在 C++11 中，右值引用常常用来实现“移动语义”，即将资源从一个对象转移到另一个对象，而不是复制数据。
+六.将亡值：Rvalue
+    1.将亡值（Rvalue）指的是能够被“销毁”的对象。
+      简单来说，右值就是将亡值。例如，std::move 就是一个将值转化为将亡值的工具。
+    2.将亡值是指向临时对象或无法再使用的对象的引用，它通常表现为右值引用。
+      将亡值的特殊性质使得它非常适用于移动语义。
+    int&& rref = std::move(x);  // std::move(x) 转换 x 为将亡值
+    使用 std::move 将一个左值转换为将亡值，意味着该对象的资源可以被“移动”到另一个对象，而不是被复制。
+    特点：
+    1.可以被“偷走”资源：将亡值通常用于实现“移动构造”和“移动赋值”。
+    2.不会再使用：一旦一个对象成为将亡值，它的资源就可以被转移，不再对原对象的状态做任何假设。
+七.完美转发：
+    完美转发是指将一个函数的参数完美地转发到另一个函数，保持原有参数类型（左值或右值）不变
+    代码示例：
+    #include <iostream>
+    #include <utility>
+
+    void printValue(int& x) 
+    {
+        std::cout << "Lvalue: " << x << std::endl;
+    }
+
+    void printValue(int&& x) 
+    {
+        std::cout << "Rvalue: " << x << std::endl;
+    }
+
+    template <typename T>
+    void forwardValue(T&& arg) 
+    {
+        printValue(std::forward<T>(arg));  // 完美转发
+    }
+
+    int main() 
+    {
+        int x = 10;
+        forwardValue(x);         // 调用 printValue(int&)
+        forwardValue(20);        // 调用 printValue(int&&)
+        return 0;
+    }
+    完美转发的关键：
+        使用 std::forward 来保持传入参数的类型（左值或右值）。
+八.移动语义：
+    移动语义允许我们将对象的资源从一个地方转移到另一个地方，而不是复制这些资源。避免不必要的复制开销
+    移动构造函数和移动赋值操作符
+        移动构造函数：使用右值引用构造新对象时，从另一个对象“窃取”资源。
+        移动赋值操作符：使用右值引用将资源从一个对象转移到另一个对象。
+    代码示例：
+    #include <iostream>
+    #include <vector>
+
+    class MyClass 
+    {
+    public:
+        MyClass() { std::cout << "Default constructor\n"; }
+        MyClass(MyClass&& other) { std::cout << "Move constructor\n"; }
+        MyClass& operator=(MyClass&& other) 
+        {
+            std::cout << "Move assignment\n";
+            return *this;
+        }
+    };
+    
+    int main() 
+    {
+        MyClass obj1;
+        MyClass obj2 = std::move(obj1);  // 移动构造
+        obj2 = std::move(obj1);           // 移动赋值
+        return 0;
+    }
+    移动构造函数：MyClass(MyClass&& other) 通过右值引用将 other 的资源移动到新创建的对象。
+    移动赋值操作符：operator=(MyClass&& other) 通过右值引用将资源从 other 转移到当前对象
+
+    总结：
+        左值引用：绑定到左值，可以修改对象的值。
+        右值引用：绑定到右值或临时对象，支持移动语义。
+        将亡值：是可以转移资源的右值，通过 std::move 将左值转换为右值引用。
+        完美转发：保持传入参数的类型（左值或右值）不变，使用 std::forward 来完美转发参数。
+        移动语义：允许对象资源的转移，而不是复制，减少不必要的资源开销。
