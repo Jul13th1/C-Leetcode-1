@@ -1,1 +1,0 @@
-# C-Leetcode-1
