@@ -1,27 +1,35 @@
 /*
-反转字符串
-示例 1： 
-输⼊：["h","e","l","l","o"] 
-输出：["o","l","l","e","h"]
+用栈实现队列
 */
-// swap两种交换数值
-/*
-第一种：引用或者指针
-int tmp = s[i];
-s[i] = s[j];
-s[j] = tmp;
-第二种：位运算
-s[i] ^= s[j];
-s[j] ^= s[i];
-s[i] ^= s[j];
-*/
-#include <iostream>
-#include <vector>
 
-void reverseString(std::vector<char> &s)
+#include <iostream>
+#include <stack>
+#include <queue>
+
+class MyQueue
 {
-    for(int i = 0,j = s.size()-1;i < s.size()/2; i++,j--)
+public:
+    std::stack<int> stIn;
+    std::stack<int> stOut;
+
+    void push(int x)
     {
-        std::swap[s[i],s[j]];
+        stIn.push(x);
     }
-}
+    //只有当stIn元素为空的时候，才将里面的元素弹入stOut
+
+    int pop()
+    {
+        if(stOut.empty())
+        {
+            while(!stIn.empty())
+            {
+                stOut.push(stIn.top());
+                stIn.pop();
+            }
+        }
+        int result = stOut.top();
+        stOut.pop();
+        return result;
+    }
+};
