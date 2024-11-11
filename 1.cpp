@@ -1,78 +1,81 @@
 /*
-单链表中的指针域只能指向节点的下⼀个节点。
-双链表：每⼀个节点有两个指针域，⼀个指向下⼀个节点，⼀个指向上⼀个节点。
-双链表 既可以向前查询也可以向后查询
-*/
-/*
-移除链表元素
-head = [1,2,6,3,4,5,6], val = 6
-输出：[1,2,3,4,5]
+有效字母异位词
+两个字符串 由相同的字母组成 顺序不同
 */
 
 #include <iostream>
-// #include 
-// 单链表
-struct ListNode 
-{
-    int val; // 节点上存储的元素
-    ListNode *next; // 指向下⼀个节点的指针
-    ListNode(int x) : val(x), next(NULL) {} // 节点的构造函数
-};
+#include <string>
 
-class Soltion
+int main()
 {
-public:
-    ListNode *removeElement(ListNode *head,int val)
+    std::string s1 = "hello";
+    std::string s2 = "lloeh";
+
+    int record[26] = {0};
+    for(int i = 0; i < s1.size(); i++)
     {
-        //删除头结点
-        while(head != NULL && head->val == val)
+        record[s1[i] - 'a']++;
+    }
+    for(int i = 0; i < s2.size(); i++)
+    {
+        record[s2[i] - 'a']--;
+    }
+    for(int i = 0; i < 26; i++)
+    {
+        if(record[i] != 0)
         {
-            ListNode *tem = head;
-            head = head->next;
-            delete tem;
+            return false;
         }
-        //删除非头结点
-        ListNode *cur = head;
-        while(cur != NULL && cur->next != NULL)
-        {
-            if(cur->next->val == val)
-            {
-                ListNode *tmp = cur->next;
-                cur->next = cur->next->next;
-                delete tmp;
-            }
-            else
-            {
-                cur = cur->next;
-            }
-        }
-        return head;
+    }
+}
+
+#include <iostream>
+#include <unordered_map>
+#include <string>
+using namespace std;
+
+bool isAnagram(string s, string t) 
+{
+    // 如果两个字符串长度不同，直接返回 false
+    if (s.length() != t.length())
+    {
+        return false;
     }
 
-    //设置一个虚拟头结点进行移除节点操作
-    ListNode *removeElement1(ListNode *head,int val)
-    {
-        //设置一个虚拟头结点
-        ListNode *dummyhead = new ListNode(0);
-        //将虚拟头结点指向head
-        dummyhead->next = head;
+    // 哈希表来统计字符频率
+    unordered_map<char, int> count_map;
 
-        ListNode *cur = dummyhead;
-        while(cur->next != NULL)
-        {
-            if(cur->next->val == val)
-            {
-                ListNode *tmp = cur->next;
-                cur->next = cur->next->next;
-                delete tmp;
-            }
-            else
-            {
-                cur = cur->next;
-            }
-        }
-        head = dummyhead->next;
-        delete dummyhead;
-        delete head;
+    // 遍历第一个字符串，增加字符的频率
+    for (char c : s) 
+    {
+        count_map[c]++;
     }
-};
+
+    // 遍历第二个字符串，减少字符的频率
+    for (char c : t) 
+    {
+        count_map[c]--;
+        // 如果某个字符频率为负数，说明该字符在 t 中出现次数比 s 中多，返回 false
+        if (count_map[c] < 0) 
+        {
+            return false;
+        }
+    }
+
+    // 如果所有字符的频率都相同，返回 true
+    return true;
+}
+
+int main() {
+    string s = "anagram";
+    string t = "nagaram";
+
+    if (isAnagram(s, t)) 
+    {
+        cout << "Yes, they are anagrams!" << endl;
+    } else {
+        cout << "No, they are not anagrams!" << endl;
+    }
+
+    return 0;
+}
