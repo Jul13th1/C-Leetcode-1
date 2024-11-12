@@ -140,3 +140,54 @@ C++ 部分笔记
         没有虚函数的类 可以使用 memset 来操作内存，但需要确保不破坏对象的内部状态。
         对于包含指针或动态分配内存的类，使用 memset 时要小心，它可能会破坏指针的有效性，导致资源泄漏或悬挂指针。
         memset 最适用于那些没有动态资源管理（例如，没有指针成员）的简单数据结构。对于需要复杂内存管理的类，最好避免使用 memset，而采用合适的构造函数、析构函数和复制控制。
+
+14.vector的元素类型可以是引用吗？
+    vector的底层实现是要求连续的对象排列，引用并非对象，没有实际地址，因此vector的元素类型不能是引用。
+    std::vector 是一个非常灵活的容器，它的元素类型可以是：
+        基本类型（如 int、char、double 等）
+        用户定义的类型（如 struct、class 等）
+        指针类型（如 int*、double* 等）
+        其他模板类型（如 std::pair、std::tuple 等）
+        容器类型（如 std::vector<int>、std::map 等）
+        智能指针类型（如 std::unique_ptr、std::shared_ptr 等）
+        函数指针或 std::function 类型
+        std::variant 类型（用于存储不同类型）
+    虽然 C++ 不允许 std::vector 存储引用类型（因为引用本质上不是一个对象，它必须绑定到一个有效的对象），但是你可以通过指针来间接存储引用。
+        int a = 5;
+        int b = 10;
+        std::vector<int*> vec7 = {&a, &b};  // 存储整数的指针
+
+15.正确释放vector的内存（clear() sawp() shrink_to_fit()）
+    vec.clear():清空内容，但是不释放内存
+    vector().swap(vec):清空内容，且释放内存
+    vec.shrink_to_fit():请求容器降低其capacity和size匹配
+
+16.map的插入方式有哪几种？
+    1. 用insert函数插入pair数据，
+        mapStudent.insert(pair<int, string>(1, "student_one"));
+    2.用insert函数插入value_type数据
+        mapStudent.insert(map<int, string>::value_type (1, "student_one"));
+    3.在insert函数中使用make_pair()函数
+        mapStudent.insert(make_pair(1, "student_one"));
+    4.用数组方式插入数据
+        mapStudent[1] = "student_one"; 
+
+17.map 、set、multiset、multimap的底层原理
+    map 、set、multiset、multimap的底层实现都是红黑树，epoll模型的底层数据结构也是红黑树，linux系统中CFS进程调度算法，也用到红黑树。
+    元素特点：
+        1.set和multiset会根据特定的排序准则自动将元素排序，set中元素不允许重复，multiset可以重复。
+        2.map和multimap将key和value组成的pair作为元素，根据key的排序准则自动将元素排序（因为红黑树也是二叉搜索树，所以map默认是按key排序的），map中元素的key不允许重复，multimap可以重复。
+    为何map和set的插入删除效率比其他序列容器高，而且每次insert之后，以前保存的iterator不会失效？
+        因为存储的是结点，不需要内存拷贝和内存移动。
+        因为插入操作只是结点指针换来换去，结点内存没有改变。而iterator就像指向结点的指针，内存没变，指向内存的指针也不会变。
+
+18.STL的各个容器的迭代器在什么情况下失效？
+    std::vector	插入或删除元素（尤其是在中间），尤其是扩展时
+    std::deque	插入或删除中间元素时，扩展时可能会失效
+    std::list	删除当前元素会使迭代器失效，插入不失效
+    std::map / std::set	删除当前元素会使迭代器失效，插入不失效
+    std::unordered_map / std::unordered_set	删除当前元素会使迭代器失效，扩展时可能失效
+    std::stack / std::queue	不支持迭代器，不能直接遍历
+    std::array	不会失效，大小固定
+    std::priority_queue	不支持迭代器，不会失效
+
