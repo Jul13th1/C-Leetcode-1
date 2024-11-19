@@ -1,78 +1,44 @@
 /*
-单链表中的指针域只能指向节点的下⼀个节点。
-双链表：每⼀个节点有两个指针域，⼀个指向下⼀个节点，⼀个指向上⼀个节点。
-双链表 既可以向前查询也可以向后查询
-*/
-/*
-移除链表元素
-head = [1,2,6,3,4,5,6], val = 6
-输出：[1,2,3,4,5]
+给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
+输入: nums = [1,3,5,6], target = 5
+输出: 2
 */
 
 #include <iostream>
-// #include 
-// 单链表
-struct ListNode 
-{
-    int val; // 节点上存储的元素
-    ListNode *next; // 指向下⼀个节点的指针
-    ListNode(int x) : val(x), next(NULL) {} // 节点的构造函数
-};
+#include <vector>
 
-class Soltion
+class Sulation
 {
 public:
-    ListNode *removeElement(ListNode *head,int val)
+    int SearchIndex(std::vector<int> nums,int target)
     {
-        //删除头结点
-        while(head != NULL && head->val == val)
+        int left = 0;
+        int right = nums.size()-1;
+        while(left <= right)
         {
-            ListNode *tem = head;
-            head = head->next;
-            delete tem;
-        }
-        //删除非头结点
-        ListNode *cur = head;
-        while(cur != NULL && cur->next != NULL)
-        {
-            if(cur->next->val == val)
+            int mid = (left+right)/2;
+            if(nums[mid] >= target)
             {
-                ListNode *tmp = cur->next;
-                cur->next = cur->next->next;
-                delete tmp;
+                right = mid-1;
             }
             else
             {
-                cur = cur->next;
+                left = mid+1;
             }
         }
-        return head;
-    }
 
-    //设置一个虚拟头结点进行移除节点操作
-    ListNode *removeElement1(ListNode *head,int val)
-    {
-        //设置一个虚拟头结点
-        ListNode *dummyhead = new ListNode(0);
-        //将虚拟头结点指向head
-        dummyhead->next = head;
-
-        ListNode *cur = dummyhead;
-        while(cur->next != NULL)
-        {
-            if(cur->next->val == val)
-            {
-                ListNode *tmp = cur->next;
-                cur->next = cur->next->next;
-                delete tmp;
-            }
-            else
-            {
-                cur = cur->next;
-            }
-        }
-        head = dummyhead->next;
-        delete dummyhead;
-        delete head;
+        std::cout << left << std::endl;
+        return left;
     }
 };
+
+int main()
+{
+    Sulation s;
+    std::vector<int> nums = {1,2,3,4,5};
+    int target = 2;
+
+    s.SearchIndex(nums,target);
+
+    return 0;
+}
